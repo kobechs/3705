@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/style.css">
+    <title>ITパスポート用語クイズ</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        #quiz, #startScreen {
+            display: none;
+            text-align: center;
+        }
+        .option-button {
+            margin: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        let no = 0;
+        let score = 0;
+        const quizData = [
+            { question: "データベース管理システムを略して何と呼ぶ？", correct: "DBMS", options: ["DBMS", "SQL", "OS"] },
+            { question: "クラウドコンピューティングの代表的なサービスは？", correct: "IaaS", options: ["IaaS", "PaaS", "SaaS"] },
+            { question: "ネットワークの遅延を表す単位は？", correct: "ms", options: ["ms", "GB", "Mbps"] },
+            { question: "プログラムを実行するためのソフトウェアは何と呼ばれる？", correct: "ランタイム", options: ["エディタ", "ランタイム", "コンパイラ"] },
+            { question: "セキュリティにおける「CIA」とは何の略か？", correct: "機密性・完全性・可用性", options: ["機密性・完全性・可用性", "クリティカル・インシデント・アナリシス", "コンピュータ・インフォメーション・アーキテクチャ"] },
+            { question: "ネットワークにおける「トラフィック」とは何を指す？", correct: "データの流量", options: ["データの流量", "ネットワーク機器", "プロトコル"] },
+            { question: "ファイアウォールの役割は何ですか？", correct: "ネットワークの安全を保つこと", options: ["データの圧縮", "ネットワークの安全を保つこと", "ユーザー管理"] },
+            { question: "バグを修正することを何と呼ぶ？", correct: "デバッグ", options: ["デバッグ", "コンパイル", "エラーチェック"] },
+            { question: "オープンソースソフトウェアの利点は？", correct: "自由に使用・改良できる", options: ["高価", "自由に使用・改良できる", "サポートがない"] },
+            { question: "CPUの役割は？", correct: "計算と制御", options: ["記憶", "計算と制御", "入力"] },
+            { question: "データを安全に保管するための技術は？", correct: "暗号化", options: ["バックアップ", "暗号化", "ハッシュ"] },
+            { question: "インターネットの基盤技術は？", correct: "TCP/IP", options: ["HTTP", "TCP/IP", "FTP"] },
+            { question: "システム開発における「ウォーターフォールモデル」とは？", correct: "段階的な開発手法", options: ["アジャイル", "段階的な開発手法", "スパイラルモデル"] },
+            { question: "DNSの役割は？", correct: "ドメイン名をIPアドレスに変換", options: ["メール送信", "ドメイン名をIPアドレスに変換", "データ転送"] },
+            { question: "プログラムの流れを示す図を何と呼ぶ？", correct: "フローチャート", options: ["フローチャート", "マインドマップ", "ER図"] },
+            { question: "エラーが発生した場合にプログラムがどうなるかを表す指標は？", correct: "エラーハンドリング", options: ["デバッグ", "エラーハンドリング", "テスト"] },
+            { question: "ITILは何の略か？", correct: "ITサービス管理のフレームワーク", options: ["情報技術インフラストラクチャライブラリ", "インターネット技術インフラライブラリ", "情報技術インターフェースライブラリ"] },
+            { question: "SQLの主な用途は？", correct: "データベース操作", options: ["プログラムの実行", "データベース操作", "ネットワーク設定"] },
+            { question: "情報セキュリティにおいて重要な要素は？", correct: "リスク管理", options: ["リスク管理", "ネットワーク監視", "ユーザー認証"] },
+            { question: "マルウェアとは？", correct: "悪意のあるソフトウェア", options: ["正常なソフトウェア", "悪意のあるソフトウェア", "オープンソースソフトウェア"] },
+            { question: "ソフトウェア開発における「アジャイル」とは？", correct: "迅速な開発手法", options: ["迅速な開発手法", "段階的開発手法", "計画的開発手法"] },
+        ];
+
+        function startQuiz() {
+            document.getElementById("startScreen").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (no < quizData.length) {
+                const questionElement = document.getElementById("question");
+                const optionsElement = document.getElementById("options");
+                questionElement.innerHTML = quizData[no].question;
+
+                optionsElement.innerHTML = "";
+                const options = [...quizData[no].options];
+                options.sort(() => Math.random() - 0.5); // 選択肢をシャッフル
+
+                options.forEach(option => {
+                    optionsElement.innerHTML += `
+                        <button class="option-button" onclick="judge('${option}')">${option}</button>
+                    `;
+                });
+            } else {
+                document.getElementById("question").style.display = "none";
+                const resultElement = document.getElementById("resultMessage");
+                const feedbackElement = document.getElementById("feedbackMessage");
+                
+                resultElement.innerHTML = `スコア: ${score} / ${quizData.length}`;
+                
+                if (score === 20) {
+                    feedbackElement.innerHTML = "完璧！";
+                } else if (score >= 13) {
+                    feedbackElement.innerHTML = "あともう少し！";
+                } else {
+                    feedbackElement.innerHTML = "もう少し勉強しましょう";
+                }
+                
+                document.getElementById("options").style.display = "none";
+            }
+        }
+
+        function judge(selectedAnswer) {
+            if (selectedAnswer === quizData[no].correct) {
+                alert("正解です！");
+                score++;
+            } else {
+                alert("残念！不正解です。");
+            }
+            no++;
+            showQuestion();
+        }
+    </script>
+</head>
+<body onload="document.getElementById('startScreen').style.display='block'">
+    <div id="startScreen">
+        <h1>ITパスポート用語クイズ</h1>
+        <p>クイズを始めるには、以下のボタンをクリックしてください。</p>
+        <button class="option-button" onclick="startQuiz()">スタート</button>
+    </div>
+    <div id="quiz">
+        <div id="question"></div>
+        <div id="options"></div>
+        <p id="resultMessage"></p>
+        <p id="feedbackMessage"></p>
+    </div>
+</body>
+</html>
